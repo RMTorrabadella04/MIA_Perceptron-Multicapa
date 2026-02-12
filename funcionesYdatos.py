@@ -13,12 +13,14 @@ def datos():
 
     datos = datasets.fetch_openml('emnist_balanced', version=1, as_frame=False)
     X = datos.data
-    y = datos.target
+    y = datos.target.astype(int)
 
+    y_one_hot = np.eye(47)[y]
+    
     scaler = minmax()
     X_normalizado = scaler.fit_transform(X)
 
-    X_train, X_test, y_train, y_test = train_test_split(X_normalizado, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X_normalizado, y_one_hot, test_size=0.2, random_state=42)
     
     return X_train, X_test, y_train, y_test
 

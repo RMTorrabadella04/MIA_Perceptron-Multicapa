@@ -31,7 +31,20 @@ class PerceptronMulticapa:
         
         X_train, X_test, y_train, y_test = fyd.datos()
         
-
+        print("Entrenando el modelo...")
+        
+        for epoch in range(epochs):
+            
+            activaciones, zs = self.forward(X_train, func_act)
+            
+            self.backpropagation(activaciones, zs, y_train, func_act_derivada, learning_rate)
+            
+            loss = np.mean(np.square(activaciones[-1] - y_train))
+            
+            print(f"Epoch {epoch+1}/{epochs}, Loss: {loss:.4f}\n")
+            
+        return X_test, y_test
+    
     # La ida (forward)
 
     def forward(self, X, func_act):
@@ -69,13 +82,50 @@ class PerceptronMulticapa:
             if i > 0:
                 delta = delta_proximo
 
+    # Función de predicción
+
+    def predict(self, X, func_act):
+        
+        activaciones, _ = self.forward(X, func_act)
+        
+        y_prediccion = activaciones[-1]
+
+        return np.argmax(y_prediccion, axis=1)
+
 if __name__ == "__main__":
     # Parámetros del entrenamiento
     
     epochs = 10
     learning_rate = 0.01
-    func_act = fyd.relu
-    func_act_derivada = fyd.relu_derivada
     
     modelo = PerceptronMulticapa(784, 100, 47)
-    modelo.training(epochs, learning_rate, func_act, func_act_derivada)
+    
+    for funcion in [fyd.logistic, fyd.tanh, fyd.relu]:
+        # Para que use todas las funciones de activación, sin tener que cambiar el código cada vez.
+        
+        if funcion == fyd.logistic:
+            fun_derivada = fyd.logistic_derivada
+        elif funcion == fyd.tanh:
+            fun_derivada = fyd.tanh_derivada
+        elif funcion == fyd.relu:
+            fun_derivada = fyd.relu_derivada
+
+        X_test, y_test = modelo.training(epochs, learning_rate, funcion, fun_derivada)
+        
+        y_prediccion = modelo.predict(X_test, funcion)
+        
+        # Matriz de Confusion
+        
+        y_test_normal = np.argmax(y_test, axis=1)
+        
+        cm = confusion_matrix(y_test_normal, y_prediccion)
+        
+        fig, ax = plt.subplots(figsize=(12, 12))
+        
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+        
+        disp.plot(cmap='Blues', ax=ax, colorbar=True)
+        
+        plt.title(f'Matriz de Confusión - {funcion.__name__} - EMNIST Balanced')
+        
+        plt.show()
