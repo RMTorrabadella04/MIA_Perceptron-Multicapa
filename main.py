@@ -13,12 +13,12 @@ import matplotlib.pyplot as plt
 
 class PerceptronMulticapa:
     def __init__(self, n_entradas, n_ocultas, n_salidas):
-        self.capas = [n_entradas, n_ocultas, n_salidas]
+        self.capas = [n_entradas] + list(n_ocultas) + [n_salidas]
         self.pesos = []
         self.biases = []
     
         for i in range(len(self.capas) - 1):
-            peso = np.random.randn(self.capas[i], self.capas[i+1]) * 0.01
+            peso = np.random.randn(self.capas[i], self.capas[i+1]) * np.sqrt(2.0 / self.capas[i])
             bias = np.zeros((1, self.capas[i+1]))
             
             self.pesos.append(peso)
@@ -26,10 +26,7 @@ class PerceptronMulticapa:
 
     # El entrenamiento del modelo
 
-    def training(self, epochs, learning_rate, func_act, func_act_derivada):
-        # Recogemos los datos
-        
-        X_train, X_test, y_train, y_test = fyd.datos()
+    def training(self, X_train, y_train, epochs, learning_rate, func_act, func_act_derivada):
         
         print("Entrenando el modelo...")
         
@@ -42,8 +39,6 @@ class PerceptronMulticapa:
             loss = np.mean(np.square(activaciones[-1] - y_train))
             
             print(f"Epoch {epoch+1}/{epochs}, Loss: {loss:.4f}\n")
-            
-        return X_test, y_test
     
     # La ida (forward)
 
@@ -93,39 +88,42 @@ class PerceptronMulticapa:
         return np.argmax(y_prediccion, axis=1)
 
 if __name__ == "__main__":
-    # Parámetros del entrenamiento
     
-    epochs = 10
-    learning_rate = 0.01
-    
-    modelo = PerceptronMulticapa(784, 100, 47)
-    
-    for funcion in [fyd.logistic, fyd.tanh, fyd.relu]:
-        # Para que use todas las funciones de activación, sin tener que cambiar el código cada vez.
-        
-        if funcion == fyd.logistic:
-            fun_derivada = fyd.logistic_derivada
-        elif funcion == fyd.tanh:
-            fun_derivada = fyd.tanh_derivada
-        elif funcion == fyd.relu:
-            fun_derivada = fyd.relu_derivada
+    X_train, X_test, y_train, y_test = fyd.datos()
 
-        X_test, y_test = modelo.training(epochs, learning_rate, funcion, fun_derivada)
-        
-        y_prediccion = modelo.predict(X_test, funcion)
-        
-        # Matriz de Confusion
-        
-        y_test_normal = np.argmax(y_test, axis=1)
-        
-        cm = confusion_matrix(y_test_normal, y_prediccion)
-        
-        fig, ax = plt.subplots(figsize=(12, 12))
-        
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-        
-        disp.plot(cmap='Blues', ax=ax, colorbar=True)
-        
-        plt.title(f'Matriz de Confusión - {funcion.__name__} - EMNIST Balanced')
-        
-        plt.show()
+    capas_ocultas = [(50,), (100,), (50, 50), (100, 50)]
+    funciones = [
+        (fyd.logistic, fyd.logistic_derivada),
+        (fyd.tanh,     fyd.tanh_derivada),
+        (fyd.relu,     fyd.relu_derivada),
+    ]
+    learning_rates = [0.001, 0.01]
+    epochs = 30
+
+    resultados = []
+
+    for capas in capas_ocultas:
+        for lr in learning_rates:
+            for funcion, fun_derivada in funciones:
+                print(f"\nCapas: {capas} | LR: {lr} | Función: {funcion.__name__}")
+                
+                modelo = PerceptronMulticapa(784, capas, 47)
+                modelo.training(X_train, y_train, epochs, lr, funcion, fun_derivada)
+                
+                y_prediccion = modelo.predict(X_test, funcion)
+                y_test_normal = np.argmax(y_test, axis=1)
+                
+                accuracy = np.mean(y_prediccion == y_test_normal)
+                print(f"Accuracy: {accuracy:.4f}")
+                
+                resultados.append({
+                    'capas': capas,
+                    'lr': lr,
+                    'funcion': funcion.__name__,
+                    'accuracy': accuracy
+                })
+
+    # Mostrar tabla de resultados
+    print("\n=== RESUMEN GRID SEARCH ===")
+    for r in sorted(resultados, key=lambda x: x['accuracy'], reverse=True):
+        print(f"Capas: {r['capas']} | LR: {r['lr']} | Función: {r['funcion']} | Accuracy: {r['accuracy']:.4f}")
