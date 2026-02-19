@@ -87,6 +87,7 @@ class PerceptronMulticapa:
 
         return np.argmax(y_prediccion, axis=1)
 
+
 if __name__ == "__main__":
     
     X_train, X_test, y_train, y_test = fyd.datos()
@@ -123,7 +124,30 @@ if __name__ == "__main__":
                     'accuracy': accuracy
                 })
 
-    # Mostrar tabla de resultados
-    print("\n=== RESUMEN GRID SEARCH ===")
+    # Tabla de resultados
+    
+    print("\n------- RESUMEN DE LOS MODELOS ENTRENADOS -------")
     for r in sorted(resultados, key=lambda x: x['accuracy'], reverse=True):
-        print(f"Capas: {r['capas']} | LR: {r['lr']} | Función: {r['funcion']} | Accuracy: {r['accuracy']:.4f}")
+        print(f"Capas: {r['capas']} - LR: {r['lr']} - Función: {r['funcion']} - Accuracy: {r['accuracy']:.4f}")
+    
+    # Con el mejor resultado, entreno el modelo final
+    mejor_resultado = max(resultados, key=lambda x: x['accuracy'])
+    
+    modelo_final = PerceptronMulticapa(784, mejor_resultado['capas'], 47)
+    modelo_final.training(X_train, y_train, epochs, mejor_resultado['lr'], mejor_resultado['funcion'], mejor_resultado['fun_derivada'])
+
+    y_prediccion_final = modelo_final.predict(X_test, mejor['fun_obj'])
+    y_test_normal = np.argmax(y_test, axis=1)
+    accuracy_final = np.mean(y_prediccion_final == y_test_normal)
+    print(f"\nAccuracy final: {accuracy_final:.4f}")
+    
+    # Matriz de confusión
+    cm = confusion_matrix(y_test_normal, y_prediccion_final)
+    fig, ax = plt.subplots(figsize=(10, 10))
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+    disp.plot(ax=ax)
+    plt.title("Matriz de Confusión - Mejor Modelo")
+    plt.show()
+    
+    # Classification report
+    print(f"\nClassification Report: {classification_report(y_test_normal, y_prediccion_final)}")
