@@ -121,6 +121,7 @@ if __name__ == "__main__":
                     'capas': capas,
                     'lr': lr,
                     'funcion': funcion.__name__,
+                    'fun_derivada': fun_derivada.__name__,
                     'accuracy': accuracy
                 })
 
@@ -136,7 +137,7 @@ if __name__ == "__main__":
     modelo_final = PerceptronMulticapa(784, mejor_resultado['capas'], 47)
     modelo_final.training(X_train, y_train, epochs, mejor_resultado['lr'], mejor_resultado['funcion'], mejor_resultado['fun_derivada'])
 
-    y_prediccion_final = modelo_final.predict(X_test, mejor['fun_obj'])
+    y_prediccion_final = modelo_final.predict(X_test, mejor_resultado['funcion'])
     y_test_normal = np.argmax(y_test, axis=1)
     accuracy_final = np.mean(y_prediccion_final == y_test_normal)
     print(f"\nAccuracy final: {accuracy_final:.4f}")
