@@ -27,19 +27,38 @@ class PerceptronMulticapa:
     # El entrenamiento del modelo
 
     def training(self, X_train, y_train, epochs, learning_rate, func_act, func_act_derivada):
-        
-        print("Entrenando el modelo...")
-        
-        for epoch in range(epochs):
-            
-            activaciones, zs = self.forward(X_train, func_act)
-            
-            self.backpropagation(activaciones, zs, y_train, func_act_derivada, learning_rate)
-            
-            loss = np.mean(np.square(activaciones[-1] - y_train))
-            
-            print(f"Epoch {epoch+1}/{epochs}, Loss: {loss:.4f}\n")
-    
+            batch_size = 128  # Tamaño del bloque de datos (Mini-Batch, Recomendado por la IA para un buen rendimiento y estabilidad en el entrenamiento)
+            n_muestras = X_train.shape[0]
+
+            print(f"Entrenando el modelo con Mini-Batches (Batch Size: {batch_size})...")
+
+            for epoch in range(epochs):
+                # 1. Mezclamos los datos en cada época para evitar sesgos por orden
+                indices = np.random.permutation(n_muestras)
+                X_shuffled = X_train[indices]
+                y_shuffled = y_train[indices]
+
+                loss_acumulada = 0
+
+                # 2. Bucle de Mini-Batches
+                for i in range(0, n_muestras, batch_size):
+                    X_batch = X_shuffled[i:i + batch_size]
+                    y_batch = y_shuffled[i:i + batch_size]
+
+                    # Forward pass con el batch actual
+                    activaciones, zs = self.forward(X_batch, func_act)
+
+                    # Backpropagation con el batch actual
+                    self.backpropagation(activaciones, zs, y_batch, func_act_derivada, learning_rate)
+
+                    # Calculamos el error del batch para el seguimiento
+                    loss_batch = np.mean(np.square(activaciones[-1] - y_batch))
+                    loss_acumulada += loss_batch
+
+                # Promedio de pérdida de la época
+                loss_epoca = loss_acumulada / (n_muestras / batch_size)
+                print(f"Epoch {epoch+1}/{epochs} completada - Loss: {loss_epoca:.4f}")
+
     # La ida (forward)
 
     def forward(self, X, func_act):
@@ -120,8 +139,8 @@ if __name__ == "__main__":
                 resultados.append({
                     'capas': capas,
                     'lr': lr,
-                    'funcion': funcion.__name__,
-                    'fun_derivada': fun_derivada.__name__,
+                    'funcion': funcion,
+                    'fun_derivada': fun_derivada,
                     'accuracy': accuracy
                 })
 
@@ -143,9 +162,26 @@ if __name__ == "__main__":
     print(f"\nAccuracy final: {accuracy_final:.4f}")
     
     # Matriz de confusión
+    
+    np.set_printoptions(threshold=np.inf)
+    
+    # Por consola para ver los números en caso de quererlos
+    
     cm = confusion_matrix(y_test_normal, y_prediccion_final)
     print("\nMatriz de Confusión:\n")
     print(cm)
     
+    # Imagen de la matriz de confusión sin numeros para una mejor visualización (con números se ve muy mal)
+    
+    fig, ax = plt.subplots(figsize=(15, 15)) 
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+
+    disp.plot(cmap='viridis', ax=ax, include_values=False) 
+
+    plt.title("Matriz de Confusión - EMNIST")
+    plt.show()
+    
+    fig.savefig("matriz_confusion_emnist.png")
+    
     # Classification report
-    print(f"\nClassification Report: {classification_report(y_test_normal, y_prediccion_final)}")
+    print(f"\nClassification Report: {classification_report(y_test_normal, y_prediccion_final, zero_division=0)}")
