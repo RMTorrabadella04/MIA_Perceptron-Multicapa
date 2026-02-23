@@ -143,11 +143,8 @@ if __name__ == "__main__":
     
     # Matriz de confusión
     cm = confusion_matrix(y_test_normal, y_prediccion_final)
-    fig, ax = plt.subplots(figsize=(10, 10))
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-    disp.plot(ax=ax)
-    plt.title("Matriz de Confusión - Mejor Modelo")
-    plt.show()
+    print("\nMatriz de Confusión:\n")
+    print(cm)
     
     # Classification report
     print(f"\nClassification Report: {classification_report(y_test_normal, y_prediccion_final)}")
