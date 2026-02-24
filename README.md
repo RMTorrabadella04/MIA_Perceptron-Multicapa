@@ -1,5 +1,7 @@
-##  <center> Práctica Perceptron Multicapa </center>
+## `<center>` Práctica Perceptron Multicapa `</center>`
+
 ### Autor: Raúl Martín Torrabadella Mendoza
+
 ### Introducción
 
 En esta práctica abordaremos uno de los problemas fundacionales de la visión artificial: el reconocimiento de caracteres (OCR) mediante un Perceptrón Multicapa (MLP).
@@ -7,69 +9,95 @@ En esta práctica abordaremos uno de los problemas fundacionales de la visión a
 El objetivo no es solo que la red "funcione", sino que comprendáis la importancia de la arquitectura y los hiperparámetros en el resultado final. En el entorno profesional, la diferencia entre un modelo mediocre y uno productivo reside en la capacidad del ingeniero para ajustar estos valores sistemáticamente.
 
 ### Objetivos
+
 Con la realización de esta práctica se persiguen los siguientes objetivos formativos:
 
 - Implementar un flujo de trabajo de Deep Learning: Desde la ingesta de datos hasta la predicción final.
-
 - Manejo de Librerías vs. Algoritmia Pura: Ser capaz de utilizar frameworks de alto nivel o, alternativamente, demostrar una comprensión profunda implementando el algoritmo desde cero.
-
 - Optimización Sistemática: Aplicar técnicas de Grid Search para evitar el ajuste manual y aleatorio de hiperparámetros.
-
 - Evaluación Crítica: Interpretar métricas más allá del accuracy global, analizando errores específicos mediante matrices de confusión.
-
 - Documentación Profesional: Sintetizar decisiones técnicas y resultados en una memoria formal.
 
-### Pasos
+### Estructura y Archivos
 
-#### Paso 1: Selección y Preparación del Dataset
+MIA_PerceotronMulticapa/
+├── .gitignore
+├── .python-version
+├── README.md
+├── funcionesYdatos.py
+├── main.py
+├── matriz_confusion_emnist.png
+├── pyproject.toml
+└── requirement.txt
 
-En mi caso hice la opción b:
-Opción B (Reto): EMNIST (Letras manuscritas) o combinaciones similares.
+#### funcionesYdatos.py
 
-Como se puede ver en el documento [funcionesYdatos.py](https://github.com/RMTorrabadella04/MIA_Perceptron-Multicapa/blob/master/funcionesYdatos.py).
+Este archivo contiene la recogida de datos, además de las funciones de activación y sus funciones derivadas.
 
-#### Paso 2: Estrategia de Implementación
+#### main.py
 
-En mi caso hice la opción b:
-Ruta B (Implementación Propia - "From Scratch"): Programar el MLP usando solo NumPy (implementando la propagación hacia adelante y el backpropagation manualmente). Esta opción demuestra un dominio superior de la materia y será valorada muy positivamente.
+Este archivo contiene toda la lógica detras del entrenamiento (Es el archivo a ejecutar).
 
-Como se puede ver en el documento [main.py](https://github.com/RMTorrabadella04/MIA_Perceptron-Multicapa/blob/master/main.py)
+#### matriz_confusion_emnist.png
 
-#### Paso 3: Diseño del Experimento (Grid Search)
+Es la matriz de confusión de la combinación con un mayor accuracy.
 
-No basta con entrenar una vez. Debéis diseñar una búsqueda de la arquitectura óptima.
+#### requirement.txt
 
-Definid un diccionario de hiperparámetros a explorar. Ejemplos:
+Este archivo contiene todas las librerias necesarias a instalar, para usarlo deberas ejecutar el siguiente comando, además de tener instalado python.
 
-  - Capas ocultas: [(50,), (100,), (50, 50), (100, 50)]
+```
+pip install -r requirement.txt
+```
 
-  - Funciones de activación: ['relu', 'tanh', 'logistic']
+Cabe aclarar que si quieres usar un entorno virtual sera el siguiente proceso.
 
-  - Tasa de aprendizaje (Learning Rate): [0.001, 0.01]
+```
+uv venv [NOMBRE_ENTORNO_VIRTUAL]
 
-Ejecutad la búsqueda (usando GridSearchCV o bucles propios si habéis hecho la implementación manual) y almacenad los resultados.
+.[NOMBRE_ENTORNO_VIRTUAL]\Scripts\activate
 
-#### Paso 4: Entrenamiento y Validación del Modelo Final
+# Por defecto el venv, viene sin nada instalado, por lo que instalaremos pip
+python -m ensurepip
 
-Seleccionad la mejor configuración ganadora del paso anterior.
-
-Re-entrenad el modelo con el conjunto de Train completo.
-
-Realizad las predicciones sobre el conjunto de Test.
-
-#### Paso 5: Análisis de Resultados
-
-Calculad la precisión final (Accuracy).
-
-Generad y visualizad la Matriz de Confusión.
-
-Identificad visualmente 3 o 4 casos donde la red haya fallado (ej. confundir un 9 con un 4) y añadidlos a la memoria.
+python -m pip install -r requirement.txt
+```
 
 ### Resultados Finales
 
-- Accuracy:
+Los resultados finales de **mi último entrenamiento y predicción** son:
 
-- Matriz de Confusión:
+* Tabla Resumen:
 
-  ![ImagenMatriz](https://github.com/RMTorrabadella04/MIA_Perceptron-Multicapa/blob/master/matriz_confusion_emnist.png)
+***Mejor Combinación ira en Negrita y Cursiva***
 
+| Capas               | Learning Rate | Función de Activación | Accuracy       |
+| ------------------- | ------------- | ----------------------- | -------------- |
+| [50, ]              | 0.001         | logistic                | 0.3378         |
+| [50, ]              | 0.001         | tanh                    | 0.5742         |
+| [50, ]              | 0.001         | relu                    | 0.5796         |
+| [50, ]              | 0.01          | logistic                | 0.6182         |
+| [50, ]              | 0.01          | tanh                    | 0.7078         |
+| [50, ]              | 0.01          | relu                    | 0.7253         |
+| [100, ]             | 0.001         | logistic                | 0.6384         |
+| [100, ]             | 0.001         | tanh                    | 0.5846         |
+| [100, ]             | 0.001         | relu                    | 0.5944         |
+| [100, ]             | 0.01          | logistic                | 0.3912         |
+| [100, ]             | 0.01          | tanh                    | 0.5796         |
+| [100, ]             | 0.01          | relu                    | 0.7491         |
+| [50,  50]          | 0.001         | logistic                | 0.1733         |
+| [50,  50]          | 0.001         | tanh                    | 0.8707         |
+| [50,  50]          | 0.001         | relu                    | 0.6050         |
+| [50,  50]          | 0.01          | logistic                | 0.5247         |
+| [50,  50]          | 0.01          | tanh                    | 0.7358         |
+| [50,  50]          | 0.01          | relu                    | 0.7708         |
+| [100,  50]         | 0.001         | logistic                | 0.1592         |
+| [100,  50]         | 0.001         | tanh                    | 0.5767         |
+| [100,  50]         | 0.001         | relu                    | 0.6199         |
+| [100,  50]         | 0.01          | logistic                | 0.5464         |
+| [100,  50]         | 0.01          | tanh                    | 0.7644         |
+| ***[100,  50]*** | ***0.01***  | ***relu***            | ***0.7863*** |
+
+* Matriz de Confusión:
+
+![ImagenMatriz](https://github.com/RMTorrabadella04/MIA_Perceptron-Multicapa/blob/master/matriz_confusion_emnist.png)

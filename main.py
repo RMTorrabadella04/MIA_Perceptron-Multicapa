@@ -1,5 +1,5 @@
 # Con Sklean pillare el dataset EMNIST, Normalizare, Split, Confusion Matrix, Classification Report
-# No pillare nada para hacer el modelo, el modelo lo hare a mano con numpy solo.
+# No pillare nada para hacer el modelo, el modelo lo haré a mano con numpy solo.
 
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, classification_report
 
