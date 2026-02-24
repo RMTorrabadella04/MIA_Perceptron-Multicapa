@@ -1,4 +1,4 @@
-## `<center>` Práctica Perceptron Multicapa `</center>`
+## Práctica Perceptron Multicapa
 
 ### Autor: Raúl Martín Torrabadella Mendoza
 
@@ -109,4 +109,5 @@ Los resultados finales de **mi último entrenamiento y predicción** son:
 * Matriz de Confusión:
 
 ![ImagenMatriz](https://github.com/RMTorrabadella04/MIA_Perceptron-Multicapa/blob/master/matriz_confusion_emnist.png)
+
 
