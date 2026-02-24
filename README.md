@@ -21,13 +21,21 @@ Con la realización de esta práctica se persiguen los siguientes objetivos form
 ### Estructura y Archivos
 
 MIA_PerceotronMulticapa/
+
 ├── .gitignore
+
 ├── .python-version
+
 ├── README.md
+
 ├── funcionesYdatos.py
+
 ├── main.py
+
 ├── matriz_confusion_emnist.png
+
 ├── pyproject.toml
+
 └── requirement.txt
 
 #### funcionesYdatos.py
@@ -101,3 +109,4 @@ Los resultados finales de **mi último entrenamiento y predicción** son:
 * Matriz de Confusión:
 
 ![ImagenMatriz](https://github.com/RMTorrabadella04/MIA_Perceptron-Multicapa/blob/master/matriz_confusion_emnist.png)
+
